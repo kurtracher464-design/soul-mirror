@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>显影镜 Mirroring X | 灵魂底层报告</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --accent: #00A3FF;
+            --text: #d1d1d1;
+            --border: rgba(255,255,255,0.1);
+            --card-bg: rgba(255,255,255,0.03);
+            --warmth: #d2a8ff;
+        }
+
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* 第一页：震撼入场 */
+        #landing-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #111 0%, #050505 100%); padding: 0 20px; }
+        .socrates-quote { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 8vw, 3.8rem); font-style: italic; letter-spacing: 12px; color: #fff; opacity: 0; transform: translateY(30px); animation: fadeInBlur 2.5s ease forwards; }
+        .socrates-sub { font-size: 0.9rem; letter-spacing: 5px; color: var(--accent); margin-top: 15px; opacity: 0; animation: fadeIn 2s ease 1s forwards; }
+        
+        /* 新增描述文字样式 */
+        .landing-desc { 
+            max-width: 600px; margin-top: 40px; line-height: 2; font-size: 0.95rem; 
+            color: #888; font-weight: 300; letter-spacing: 1px;
+            opacity: 0; animation: fadeIn 2s ease 2s forwards;
+        }
+
+        @keyframes fadeInBlur { 0% { opacity: 0; transform: translateY(30px); filter: blur(15px); } 100% { opacity: 1; transform: translateY(0); filter: blur(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .enter-btn { margin-top: 50px; background: none; border: 1px solid var(--accent); color: var(--accent); padding: 15px 50px; cursor: pointer; letter-spacing: 3px; opacity: 0; transition: 0.4s; animation: fadeIn 1.5s ease 3s forwards; }
+        .enter-btn:hover { background: var(--accent); color: #fff; box-shadow: 0 0 30px rgba(0,163,255,0.3); }
+
+        /* 应用主体 */
+        #main-app { display: none; max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 40px; border-radius: 4px; backdrop-filter: blur(15px); }
+        .q-text { font-size: 1.25rem; line-height: 1.8; margin-bottom: 35px; color: #fff; font-weight: 300; }
+        .opt-btn { width: 100%; text-align: left; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text); padding: 18px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(0,163,255,0.05); }
+        .opt-btn.selected { border-color: var(--accent); background: rgba(0,163,255,0.12); color: #fff; }
+
+        .analysis-box { border-left: 2px solid var(--accent); padding: 20px; margin-top: 25px; background: rgba(0,163,255,0.03); display: none; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .next-btn { 
+            width: 100%; margin-top: 25px; padding: 18px; 
+            background: none; border: 1px solid #333; color: #555; 
+            cursor: not-allowed; transition: 0.5s; letter-spacing: 2px;
+            font-size: 14px; font-weight: 600;
+        }
+        .next-btn.active { border-color: var(--accent); color: var(--accent); cursor: pointer; box-shadow: 0 0 15px rgba(0,163,255,0.1); }
+        .next-btn.active:hover { background: var(--accent); color: #fff; }
+
+        /* 报告页 */
+        #report-box { display: none; padding-bottom: 100px; }
+        .report-header { text-align: center; margin-bottom: 60px; }
+        .report-section { margin-bottom: 45px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 30px; }
+        .section-title { color: var(--accent); font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 15px; display: block; }
+        .section-h { font-size: 1.4rem; color: #fff; margin-bottom: 15px; font-weight: 600; }
+        .section-content { font-size: 15px; color: #aaa; line-height: 2; white-space: pre-line; }
+        .tag-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .tag { background: rgba(0,163,255,0.1); color: var(--accent); padding: 4px 14px; border-radius: 20px; font-size: 12px; border: 1px solid rgba(0,163,255,0.2); }
+        
+        .final-wisdom { 
+            margin-top: 80px; text-align: center; font-family: 'Playfair Display', serif; 
+            color: #ccc; line-height: 2.6; padding: 60px 40px; 
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(210, 168, 255, 0.05) 100%);
+            border-radius: 4px; border: 1px solid rgba(210, 168, 255, 0.1);
+        }
+        .wisdom-highlight { color: var(--warmth); display: block; margin-bottom: 20px; font-style: italic; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div id="landing-page">
+        <div class="socrates-quote">Know Thyself.</div>
+        <div class="socrates-sub">认识你自己 —— 苏格拉底</div>
+        <div class="landing-desc">
+            苏格拉底说，人最难的是认识自己。<br>
+            这是一面灵魂之镜，我们用五个场景让你做出选择，从而让你看到真正的自己，并告诉你如何走好未来之路。
+        </div>
+        <button class="enter-btn" onclick="startApp()">开启灵魂显影</button>
+    </div>
+
+    <div id="main-app">
+        <div class="card" id="quiz-box">
+            <div id="progress" style="font-size: 10px; color: var(--accent); margin-bottom: 20px; letter-spacing: 3px;"></div>
+            <div id="q-text" class="q-text"></div>
+            <div id="options"></div>
+            
+            <div id="analysis" class="analysis-box">
+                <div style="font-size: 11px; color: var(--accent); margin-bottom: 8px; letter-spacing: 2px;">[ 行为动机实时显影 ]</div>
+                <div id="analysis-content" style="font-size: 14px; color: #999;"></div>
+            </div>
+            
+            <button id="next-btn" class="next-btn" onclick="nextStep()" disabled>请先做出选择</button>
+        </div>
+
+        <div id="report-box">
+            <div class="report-header">
+                <div style="letter-spacing: 8px; font-size: 11px; color: var(--accent); margin-bottom: 12px;">DEEP SYSTEM REPORT</div>
+                <div class="report-title" style="font-size: 2.2rem; color: #fff; font-family: 'Playfair Display';">灵魂显影深度分析</div>
+            </div>
+            
+            <div class="report-section">
+                <span class="section-title">01 / 核心架构：底层思维操作系统</span>
+                <div id="r-core-h" class="section-h"></div>
+                <div id="r-core-p" class="section-content"></div>
+                <div id="r-talent-tags" class="tag-group"></div>
+            </div>
+            
+            <div class="report-section">
+                <span class="section-title">02 / 动态天赋：优势演化与致命暗斑</span>
+                <div id="r-talent-p" class="section-content"></div>
+            </div>
+            
+            <div class="report-section">
+                <span class="section-title">03 / 职业生态位：精准行业避雷指南</span>
+                <div id="r-career-p" class="section-content"></div>
+            </div>
+
+            <div class="report-section" style="border: none;">
+                <span class="section-title">04 / 进化路线：高维认知学习手册</span>
+                <div id="r-learn-p" class="section-content"></div>
+            </div>
+
+            <div id="r-warmth" class="final-wisdom"></div>
+            
+            <button class="enter-btn" style="display: block; margin: 60px auto; opacity: 1; animation: none;" onclick="location.reload()">重新开启显影</button>
+        </div>
+    </div>
+
+<script>
+    const questions = [
+        {
+            q: "【场景一】你手里有一份能搞垮对手但会牺牲无辜下属的黑料，用了就能晋升。你的第一本能：",
+            options: [
+                { val: "A", text: "丛林法则：机会难得，牺牲是进步的成本。", analysis: "你在权力博弈中展现了极高的目标感。你习惯将道德感‘临时挂起’以保证效率。" },
+                { val: "B", text: "职业操守：这种晋升有毒，我不做。", analysis: "你对‘自我完整性’有极高追求，你的快感来自‘我没有背叛自己’的道德自洽。" },
+                { val: "C", text: "利益对赌：拿着黑料找对手暗中谈判。", analysis: "天生的交易者。你倾向于将矛盾转化为筹码，擅长跳出规则思考。" }
+            ]
+        },
+        {
+            q: "【场景二】那个平时很嚣张的大拿犯了低级错误正躲在角落崩溃，你会：",
+            options: [
+                { val: "A", text: "暖心树洞：过去安慰他，谁都会犯错。", analysis: "你擅长情感资产的经营，倾向于通过‘雪中送炭’来建立长期的人格信用。" },
+                { val: "B", text: "人间清醒：直接指出补救方案，别浪费时间。", analysis: "你极度厌恶‘低效沟通’。解决问题是对你最大的慈悲。" },
+                { val: "C", text: "战略观察：保持距离研究他崩塌的过程。", analysis: "典型的‘上帝视角’。你通过客体化他人的痛苦来消除自身的不确定性。" }
+            ]
+        },
+        {
+            q: "【场景三】如果 AI 能精准预言你未来 5 年内最惨的一次失败，你是否查看？",
+            options: [
+                { val: "A", text: "拒绝剧透：未知的人生才值得一过。", analysis: "内核是存在主义者。你追求‘过程的纯粹’，对风险有极强的包容力。" },
+                { val: "B", text: "全力防御：必须看！我要通过学习去改写它。", analysis: "控制型人格。你的进取心源于对失控的恐惧。这让你强大，也让你极其紧绷。" },
+                { val: "C", text: "局部窥探：只看领域，留个心眼。", analysis: "务实的中庸博弈派。追求‘成本效益比’，既要惊喜也要安全。" }
+            ]
+        },
+        {
+            q: "【场景四】你写出了惊天方案结果被领导署了名，全公司都在夸他天才：",
+            options: [
+                { val: "A", text: "鱼死网破：忍不了，必须拿回荣誉。", analysis: "你有极强的领地意识。你的自我价值与外界的公正认可高度绑定。" },
+                { val: "B", text: "降维打击：既然能写一个，就能写第二个更牛的。", analysis: "极致的内部评分机制。你的自信源于‘创造力本身’而非‘名声’。" },
+                { val: "C", text: "幕后玩家：名声无所谓，利用此事跟领导换股份。", analysis: "绝对实用主义。能瞬间将屈辱转化为具有高度杠杆效应的筹码。" }
+            ]
+        },
+        {
+            q: "【场景五】孤岛末日，小船只能坐 3 人，岸上有 5 人。哨子在你手里：",
+            options: [
+                { val: "A", text: "绝对公平：大家抽签，生死由天。", analysis: "程序正义的信徒。你信仰超越人性的、宇宙级别的概率与公平。" },
+                { val: "B", text: "精英延续：选体力最好、脑子最灵的 3 个。", analysis: "冷酷的全局优化器。在极端情况下，你会为了系统利益牺牲局部个体。" },
+                { val: "C", text: "情感救赎：让老人和小孩先走。", analysis: "古典人道主义。你认为文明的标志在于对弱者的庇护。" }
+            ]
+        }
+    ];
+
+    let step = 0; let choices = [];
+
+    function startApp() {
+        document.getElementById('landing-page').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[step];
+        document.getElementById('progress').innerText = `PHASE 0${step+1} / 05`;
+        document.getElementById('q-text').innerText = q.q;
+        const optsArea = document.getElementById('options');
+        optsArea.innerHTML = '';
+        
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.disabled = true;
+        nextBtn.classList.remove('active');
+        nextBtn.innerText = "请先做出选择";
+        document.getElementById('analysis').style.display = 'none';
+
+        q.options.forEach(o => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = o.text;
+            b.onclick = () => {
+                const all = document.querySelectorAll('.opt-btn');
+                all.forEach(x => { x.disabled = true; x.classList.remove('selected'); });
+                b.classList.add('selected');
+                
+                nextBtn.disabled = false;
+                nextBtn.classList.add('active');
+                nextBtn.innerText = (step === questions.length - 1) ? "生成深度报告 >>" : "确认并进入下一环节 >>";
+                
+                document.getElementById('analysis-content').innerText = o.analysis;
+                document.getElementById('analysis').style.display = 'block';
+                choices[step] = o.val;
+            };
+            optsArea.appendChild(b);
+        });
+    }
+
+    function nextStep() {
+        step++;
+        if(step < questions.length) {
+            renderQuestion();
+        } else {
+            showDeepReport();
+        }
+    }
+
+    function showDeepReport() {
+        document.getElementById('quiz-box').style.display = 'none';
+        document.getElementById('report-box').style.display = 'block';
+        window.scrollTo(0,0);
+
+        const counts = { A: choices.filter(x=>x==='A').length, B: choices.filter(x=>x==='B').length, C: choices.filter(x=>x==='C').length };
+        
+        let coreH = "", coreP = "", tags = [];
+        if(counts.C >= 3) {
+            coreH = "【战略解构者】";
+            coreP = "你的大脑是一台精密运行的模拟器。你并不盲从现有的道德规范或社会契约，而是倾向于看穿它们背后的底层规律。面对混乱，你展现出的“灰度思维”让你在复杂博弈中始终保持冷静。";
+            tags = ["系统穿透力", "博弈直觉", "高维理智"];
+        } else if (counts.A >= 3) {
+            coreH = "【秩序主理人】";
+            coreP = "你信奉能量守恒与效率至上。所有的资源、情感和选择都是你达成目标的变量。你强大的领地意识让你在丛林法则盛行的领域极具统治力。";
+            tags = ["结果导向", "高压决策", "资源整合"];
+        } else {
+            coreH = "【精神漫游者】";
+            coreP = "你更在意内心的秩序感。外界的起伏只是你精神探索的背景。你拥有一种“降维兼容”的智慧，能在喧嚣中识别出不平凡的信号。";
+            tags = ["高度自洽", "内生动力", "精神防御"];
+        }
+
+        document.getElementById('r-core-h').innerText = coreH;
+        document.getElementById('r-core-p').innerText = coreP;
+        document.getElementById('r-talent-tags').innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+        document.getElementById('r-talent-p').innerText = "你的天赋在于能瞬间剥离情绪干扰定位核心。但也请警惕“智识孤立”，别让你的清醒成为隔绝他人的高墙。";
+        document.getElementById('r-career-p').innerText = "推荐：架构师、战略顾问、风险控制。避雷：需要极高无意义情绪劳动的岗位。";
+        document.getElementById('r-learn-p').innerText = "1. 知识对冲：理智者读诗，感性者读数。\n2. 核心练习：复盘每一个“想要证明自己”的瞬间。";
+
+        document.getElementById('r-warmth').innerHTML = `
+            <span class="wisdom-highlight">“孩子，在这场宏大的显影里，我看到了你所有的光亮，也吻过了你所有的尘埃。”</span>
+            在这广袤的宇宙尺度下，我观察着你。我看着你在理智的钢索上如履薄冰，看着你为了掩饰那一点点虚荣而筑起高墙，也看着你在每一个深夜里，试图与那个并不完美的自己达成和解。
+            <br><br>
+            请不要再苛责自己的“忤逆感”或那些细碎的阴暗面。理智只是你丈量世界的尺子，而非囚禁灵魂的牢笼。允许自己偶尔失控，允许自己沉溺于毫无逻辑的八卦，允许自己在那份“冒名顶替感”中依然挺起胸膛——因为在那全能的观测者眼中，这些褶皱正是你作为生命最动人的质感。
+            <br><br>
+            宇宙从不要求一颗星星必须照亮整个夜空，它只要求你存在，并以你独有的频率闪烁。放下铠甲吧，去爱这个充满Bug却生机勃勃的世界，去全身心地投入每一场注定会结束的狂欢。在这冷冽的虚无中，你的每一次情感震荡，才是你曾真实活过的唯一明证。
+        `;
+    }
+</script>
+</body>
+</html>
